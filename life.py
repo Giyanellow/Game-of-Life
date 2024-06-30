@@ -25,6 +25,7 @@ def main():
     screen_size = tile_num * 20
     
     screen = pygame.display.set_mode((screen_size, screen_size))
+    pygame.display.set_caption("Conway's Game of Life")
     tile_size = screen_size / tile_num
     
     coords_data = set_coords(tile_num, life_num)
