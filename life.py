@@ -29,9 +29,10 @@ def main():
     tile_size = screen_size / tile_num
     
     coords_data = set_coords(tile_num, life_num)
-    for pos in coords_data:
-        if coords_data[pos].status:
-            print(f"Life at {pos}")
+    
+    # for pos in coords_data:
+    #     if coords_data[pos].status:
+    #         print(f"Life at {pos}")
     
     clock = pygame.time.Clock()
     
@@ -40,11 +41,32 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-                
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1: #left button add life
+                    x, y = event.pos
+                    x = x // tile_size
+                    y = y // tile_size
+                    coords_data[(x, y)].status = True
+                    print(f"Life at {x, y}")
+                    
+                elif event.button == 3: #right button delete life
+                    x, y = event.pos
+                    x = x // tile_size
+                    y = y // tile_size
+                    coords_data[(x, y)].status = False
+                    print(f"No life at {x, y}")
+        
+  
         
         screen.fill((0, 0, 0))
         draw_life(screen, tile_size, coords_data)
         draw_grid(screen, tile_size, tile_num)
+        
+       # tick = 0
+        
+        #input(f"Press Enter to continue to next generation")
+        
+       # tick = 1
         
         coords_data = update_coords(coords_data, tile_num)
         
@@ -62,6 +84,8 @@ def draw_life(screen, size, coords_data):
     for pos in coords_data:
         if coords_data[pos].status:
             pygame.draw.rect(screen, (0, 255, 0), pygame.Rect(pos[0]*size, pos[1]*size, size, size))
+        elif coords_data[pos].status == False:
+            pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(pos[0]*size, pos[1]*size, size, size))
             
 def set_coords(tile_num, life_num):
     coords_data = {}
@@ -90,13 +114,28 @@ def update_coords(coords_data, tile_num):
                 neighbor_count += 1
                     
             #print(f"Neighbor count at {pos}: {neighbor_count}")
-
-            if neighbor_count < 2 or neighbor_count > 3:
+            
+            if neighbor_count < 1:
                 new_coords_data[pos].status = False
-            elif neighbor_count > 3:
+                
+            elif neighbor_count >= 4:
                 new_coords_data[pos].status = False
-            elif neighbor_count == 2 or neighbor_count == 3:
+            
+           # elif neighbor_count == 2:
+            #    new_coords_data[pos].status = False
+                
+            elif neighbor_count == 3 or neighbor_count == 2:
                 new_coords_data[pos].status = True
+                
+            elif new_coords_data[pos].status == False and neighbor_count == 3:
+                new_coords_data[pos].status = True
+
+           # if neighbor_count < 2 or neighbor_count > 3:
+               # new_coords_data[pos].status = False
+            #elif neighbor_count > 3:
+                #new_coords_data[pos].status = False
+            #elif neighbor_count == 2 or neighbor_count == 3:
+                #new_coords_data[pos].status = True
             
     return new_coords_data
 
