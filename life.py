@@ -1,3 +1,12 @@
+'''
+GAME OF LIFE RULES:
+1. Any live cell with fewer than two live neighbors dies as if caused by underpopulation.
+2. Any live cell with two or three live neighbors lives on to the next generation.
+3. Any live cell with more than three live neighbors dies, as if by overpopulation.
+4. Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
+'''
+
+
 import pygame
 import random
 
@@ -13,8 +22,8 @@ def check_input():
     
     if tile_num < 5:
         raise ValueError("Tile number must be greater than 5")
-    if life_num < 5:
-        raise ValueError("Life number must be greater than 5")
+    if not isinstance (life_num, int):
+        raise ValueError("Life number must be an integer")
     
     return tile_num, life_num
 
@@ -36,6 +45,7 @@ def main():
     
     clock = pygame.time.Clock()
     
+    execute = False
     running = True
     while running:
         for event in pygame.event.get():
@@ -55,6 +65,15 @@ def main():
                     y = y // tile_size
                     coords_data[(x, y)].status = False
                     print(f"No life at {x, y}")
+                    
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    print("Starting Time")
+                    if execute == False:
+                        execute = True
+                    else:
+                        execute = False
+                        print("Paused")
         
   
         
@@ -62,13 +81,8 @@ def main():
         draw_life(screen, tile_size, coords_data)
         draw_grid(screen, tile_size, tile_num)
         
-       # tick = 0
-        
-        #input(f"Press Enter to continue to next generation")
-        
-       # tick = 1
-        
-        coords_data = update_coords(coords_data, tile_num)
+        if execute:
+            coords_data = update_coords(coords_data, tile_num)
         
         pygame.display.flip()
         
@@ -104,38 +118,37 @@ def update_coords(coords_data, tile_num):
     
     new_coords_data = coords_data.copy()
     
-    for pos, life in coords_data.items():
+    for pos in coords_data:
         x, y = pos
         neighbor_count = 0
         
-        for dx, dy in offsets:
-            nx, ny = x + dx, y + dy
-            if 0 <= nx < tile_num and 0 <= ny < tile_num and coords_data[(nx, ny)].status:
-                neighbor_count += 1
-                    
-            #print(f"Neighbor count at {pos}: {neighbor_count}")
+        # Alive current cell
+        if coords_data[(x, y)].status:
+            for dx, dy in offsets:
+                nx, ny = x + dx, y + dy
+                if 0 <= nx < tile_num and 0 <= ny < tile_num:  
+                    if coords_data[(nx, ny)].status:
+                        neighbor_count += 1
             
-            if neighbor_count < 1:
-                new_coords_data[pos].status = False
-                
-            elif neighbor_count >= 4:
-                new_coords_data[pos].status = False
+            if neighbor_count < 2 or neighbor_count > 3:
+                new_coords_data[(x, y)].status = False
             
-           # elif neighbor_count == 2:
-            #    new_coords_data[pos].status = False
-                
-            elif neighbor_count == 3 or neighbor_count == 2:
-                new_coords_data[pos].status = True
-                
-            elif new_coords_data[pos].status == False and neighbor_count == 3:
-                new_coords_data[pos].status = True
+            elif neighbor_count == 2 or neighbor_count == 3:
+                new_coords_data[(x, y)].status = True
+            
+            else:
+                new_coords_data[(x, y)].status = False
 
-           # if neighbor_count < 2 or neighbor_count > 3:
-               # new_coords_data[pos].status = False
-            #elif neighbor_count > 3:
-                #new_coords_data[pos].status = False
-            #elif neighbor_count == 2 or neighbor_count == 3:
-                #new_coords_data[pos].status = True
+        # Dead current cell
+        if coords_data[(x, y)].status == False:
+            for dx, dy in offsets:
+                nx, ny = x + dx, y + dy
+                if 0 <= nx < tile_num and 0 <= ny < tile_num:  
+                    if coords_data[(nx, ny)].status:
+                        neighbor_count += 1
+                        
+            if neighbor_count == 3:
+                new_coords_data[(x, y)].status = True
             
     return new_coords_data
 
