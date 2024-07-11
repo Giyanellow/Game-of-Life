@@ -20,6 +20,9 @@ def check_input():
     tile_num = int(input("Input Number of Tiles: "))
     life_num = int(input("Input Number of Life: "))
     
+    #row_num = tile_num
+    #col_num = tile_num
+    
     if tile_num < 5:
         raise ValueError("Tile number must be greater than 5")
     if not isinstance (life_num, int):
@@ -34,6 +37,9 @@ def main():
     screen_size = tile_num * 20
     
     screen = pygame.display.set_mode((screen_size, screen_size))
+    
+    generation = 0
+    life = 0
     pygame.display.set_caption("Conway's Game of Life")
     tile_size = screen_size / tile_num
     
@@ -83,6 +89,7 @@ def main():
         
         if execute:
             coords_data = update_coords(coords_data, tile_num)
+            generation += 1
         
         pygame.display.flip()
         
@@ -114,7 +121,9 @@ def set_coords(tile_num, life_num):
     return coords_data
 
 def update_coords(coords_data, tile_num):
-    offsets = [(0, 1), (0, -1), (1, 0), (-1, 0), (-1, -1), (1, 1), (-1, 1), (1, -1)]
+    offsets = [(0, 1), (0, -1), (1, 0), 
+               (-1, 0),         (-1, -1), 
+               (1, 1), (-1, 1), (1, -1)]
     
     new_coords_data = coords_data.copy()
     
